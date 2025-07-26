@@ -26,6 +26,92 @@ class _HomePageState extends State<HomePage> {
   ];
   int selectedAccentIndex = 0;
 
+  void _showAccentColorPicker() {
+    final Color accent = accentColors[selectedAccentIndex];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDarkMode ? const Color(0xFF232526) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Choose Accent Color",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: accent,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: accent),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 18,
+                  runSpacing: 18,
+                  children: List.generate(accentColors.length, (i) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedAccentIndex = i;
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        width: selectedAccentIndex == i ? 44 : 36,
+                        height: selectedAccentIndex == i ? 44 : 36,
+                        decoration: BoxDecoration(
+                          color: accentColors[i],
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: selectedAccentIndex == i
+                                ? (isDarkMode ? Colors.white : Colors.black87)
+                                : Colors.transparent,
+                            width: 3,
+                          ),
+                          boxShadow: [
+                            if (selectedAccentIndex == i)
+                              BoxShadow(
+                                color: accentColors[i].withOpacity(0.4),
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
+                          ],
+                        ),
+                        child: selectedAccentIndex == i
+                            ? Icon(Icons.check,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black87)
+                            : null,
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(height: 18),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -92,6 +178,11 @@ class _HomePageState extends State<HomePage> {
                               ? null
                               : _showFavoritesModal,
                         ),
+                        IconButton(
+                          icon: Icon(Icons.palette_rounded, color: accent),
+                          tooltip: "Choose Accent Color",
+                          onPressed: _showAccentColorPicker,
+                        ),
                       ],
                     ),
                     Container(
@@ -115,35 +206,6 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 18),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(accentColors.length, (i) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedAccentIndex = i;
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        margin: const EdgeInsets.symmetric(horizontal: 6),
-                        width: selectedAccentIndex == i ? 32 : 24,
-                        height: selectedAccentIndex == i ? 32 : 24,
-                        decoration: BoxDecoration(
-                          color: accentColors[i],
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: selectedAccentIndex == i
-                                ? (isDarkMode ? Colors.white : Colors.black87)
-                                : Colors.transparent,
-                            width: 2.2,
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 12),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
