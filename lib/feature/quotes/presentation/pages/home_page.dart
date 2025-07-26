@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:quote_app/api.dart';
-import 'package:quote_app/quote_model.dart';
+import 'package:quote_app/feature/quotes/data/datasource/quote_remote_datasource.dart';
+import 'package:quote_app/feature/quotes/data/model/quote_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {

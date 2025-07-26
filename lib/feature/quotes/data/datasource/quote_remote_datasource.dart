@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:quote_app/quote_model.dart';
+import 'package:quote_app/feature/quotes/data/model/quote_model.dart';
 import 'package:http/http.dart' as http;
 
 class Api {
