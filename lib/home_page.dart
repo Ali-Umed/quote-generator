@@ -13,6 +13,86 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<QuoteModel> favoriteQuotes = [];
+  List<QuoteModel> quoteHistory = [];
+  void _showHistoryModal() {
+    final Color accent = accentColors[selectedAccentIndex];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDarkMode ? const Color(0xFF232526) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Quote History",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: accent,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: accent),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                if (quoteHistory.isEmpty)
+                  Center(
+                    child: Text(
+                      "No history yet.",
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 300,
+                    child: ListView.separated(
+                      itemCount: quoteHistory.length,
+                      separatorBuilder: (_, __) => Divider(),
+                      itemBuilder: (context, i) {
+                        final hist = quoteHistory[i];
+                        return ListTile(
+                          title: Text(
+                            hist.q ?? '',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black87,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "- ${hist.a ?? ''}",
+                            style: TextStyle(
+                              color: accent,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   bool inProgress = false;
   QuoteModel? quote;
   String? errorMessage;
@@ -150,14 +230,8 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.format_quote_rounded,
-                          color: accent,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 8),
                         Text(
-                          "Daily Inspiration",
+                          "Quotes",
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -177,6 +251,12 @@ class _HomePageState extends State<HomePage> {
                           onPressed: favoriteQuotes.isEmpty
                               ? null
                               : _showFavoritesModal,
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.history_rounded, color: accent),
+                          tooltip: "Quote History",
+                          onPressed:
+                              quoteHistory.isEmpty ? null : _showHistoryModal,
                         ),
                         IconButton(
                           icon: Icon(Icons.palette_rounded, color: accent),
@@ -523,6 +603,14 @@ class _HomePageState extends State<HomePage> {
       final fetchedQuote = await Api.fetchRandomQuote();
       setState(() {
         quote = fetchedQuote;
+        if (fetchedQuote.q != null && fetchedQuote.a != null) {
+          final alreadyInHistory = quoteHistory
+              .any((q) => q.q == fetchedQuote.q && q.a == fetchedQuote.a);
+          if (!alreadyInHistory) {
+            quoteHistory.insert(
+                0, QuoteModel(q: fetchedQuote.q, a: fetchedQuote.a));
+          }
+        }
       });
     } catch (e) {
       setState(() {
