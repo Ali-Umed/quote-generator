@@ -15,6 +15,14 @@ class _HomePageState extends State<HomePage> {
   QuoteModel? quote;
   String? errorMessage;
   bool isDarkMode = true;
+  final List<Color> accentColors = [
+    Color(0xFFFFB300),
+    Color(0xFF42A5F5),
+    Color(0xFF66BB6A),
+    Color(0xFFAB47BC),
+    Color(0xFFEF5350),
+  ];
+  int selectedAccentIndex = 0;
 
   @override
   void initState() {
@@ -24,6 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final Color accent = accentColors[selectedAccentIndex];
     return Scaffold(
       backgroundColor:
           isDarkMode ? const Color(0xFF181A20) : const Color(0xFFF6F8FB),
@@ -51,9 +60,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Icon(
                           Icons.format_quote_rounded,
-                          color: isDarkMode
-                              ? Colors.amberAccent
-                              : Colors.blueAccent,
+                          color: accent,
                           size: 28,
                         ),
                         const SizedBox(width: 8),
@@ -100,9 +107,7 @@ class _HomePageState extends State<HomePage> {
                           isDarkMode
                               ? CupertinoIcons.sun_max_fill
                               : CupertinoIcons.moon_fill,
-                          color: isDarkMode
-                              ? Colors.amberAccent
-                              : Colors.blueAccent,
+                          color: accent,
                         ),
                         onPressed: _toggleTheme,
                         tooltip: isDarkMode
@@ -112,7 +117,45 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(accentColors.length, (i) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedAccentIndex = i;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 6),
+                        width: selectedAccentIndex == i ? 32 : 24,
+                        height: selectedAccentIndex == i ? 32 : 24,
+                        decoration: BoxDecoration(
+                          color: accentColors[i],
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: selectedAccentIndex == i
+                                ? (isDarkMode ? Colors.white : Colors.black87)
+                                : Colors.transparent,
+                            width: 2.2,
+                          ),
+                          boxShadow: selectedAccentIndex == i
+                              ? [
+                                  BoxShadow(
+                                    color: accentColors[i].withOpacity(0.4),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : [],
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(height: 12),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
@@ -120,14 +163,12 @@ class _HomePageState extends State<HomePage> {
                         ? Center(
                             child: CupertinoActivityIndicator(
                               radius: 18,
-                              color: isDarkMode
-                                  ? Colors.amberAccent
-                                  : Colors.blueAccent,
+                              color: accent,
                             ),
                           )
                         : errorMessage != null
-                            ? _buildErrorState()
-                            : _buildQuoteCard(),
+                            ? _buildErrorState(accent)
+                            : _buildQuoteCard(accent),
                   ),
                 ),
                 AnimatedContainer(
@@ -137,16 +178,14 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: isDarkMode
-                            ? Colors.amberAccent.withOpacity(0.18)
-                            : Colors.blueAccent.withOpacity(0.13),
+                        color: accent.withOpacity(0.18),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
                     ],
                   ),
                   child: CupertinoButton(
-                    color: isDarkMode ? Colors.amberAccent : Colors.blueAccent,
+                    color: accent,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 22,
                       vertical: 12,
@@ -189,7 +228,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Widget _buildQuoteCard() {
+  Widget _buildQuoteCard(Color accent) {
     if (quote == null) {
       return Center(
         child: Text(
@@ -222,18 +261,14 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(18.0),
           boxShadow: [
             BoxShadow(
-              color: isDarkMode
-                  ? Colors.amberAccent.withOpacity(0.13)
-                  : Colors.blueAccent.withOpacity(0.10),
+              color: accent.withOpacity(0.13),
               blurRadius: 18,
               spreadRadius: 2,
               offset: const Offset(0, 8),
             ),
           ],
           border: Border.all(
-            color: isDarkMode
-                ? Colors.amberAccent.withOpacity(0.18)
-                : Colors.blueAccent.withOpacity(0.13),
+            color: accent.withOpacity(0.18),
             width: 1.2,
           ),
         ),
@@ -243,7 +278,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Icon(
               Icons.format_quote_rounded,
-              color: isDarkMode ? Colors.amberAccent : Colors.blueAccent,
+              color: accent,
               size: 32,
             ),
             const SizedBox(height: 10),
@@ -275,9 +310,7 @@ class _HomePageState extends State<HomePage> {
               "- ${quote!.a}",
               style: TextStyle(
                 fontSize: 15,
-                color: isDarkMode
-                    ? Colors.amberAccent.withOpacity(0.85)
-                    : Colors.blueAccent.withOpacity(0.85),
+                color: accent.withOpacity(0.85),
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.2,
@@ -290,13 +323,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildErrorState() {
+  Widget _buildErrorState(Color accent) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
           Icons.error_outline,
-          color: Colors.redAccent,
+          color: accent,
           size: 30,
         ),
         const SizedBox(height: 10),
@@ -310,7 +343,7 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 10),
         CupertinoButton(
-          color: Colors.redAccent,
+          color: accent,
           onPressed: _fetchQuote,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: const Text(
