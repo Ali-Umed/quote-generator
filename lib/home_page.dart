@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quote_app/api.dart';
 import 'package:quote_app/quote_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +13,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    _loadPrefs().then((_) => _fetchQuote());
+  }
+
+  Future<void> _loadPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool('isDarkMode') ?? true;
+      selectedAccentIndex = prefs.getInt('selectedAccentIndex') ?? 0;
+      final favs = prefs.getStringList('favoriteQuotes') ?? [];
+      favoriteQuotes = favs.map((s) {
+        final parts = s.split('|||');
+        return QuoteModel(q: parts[0], a: parts.length > 1 ? parts[1] : '');
+      }).toList();
+    });
+  }
+
+  Future<void> _savePrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', isDarkMode);
+    await prefs.setInt('selectedAccentIndex', selectedAccentIndex);
+    final favs = favoriteQuotes.map((q) => '${q.q}|||${q.a}').toList();
+    await prefs.setStringList('favoriteQuotes', favs);
+  }
+
   List<QuoteModel> favoriteQuotes = [];
   List<QuoteModel> quoteHistory = [];
   void _showHistoryModal() {
@@ -98,7 +126,6 @@ class _HomePageState extends State<HomePage> {
   String? errorMessage;
   bool isDarkMode = true;
   final List<Color> accentColors = [
-    Color(0xFFFFB300),
     Color(0xFF42A5F5),
     Color(0xFF66BB6A),
     Color(0xFFAB47BC),
@@ -146,10 +173,11 @@ class _HomePageState extends State<HomePage> {
                   runSpacing: 18,
                   children: List.generate(accentColors.length, (i) {
                     return GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           selectedAccentIndex = i;
                         });
+                        await _savePrefs();
                         Navigator.of(context).pop();
                       },
                       child: AnimatedContainer(
@@ -190,12 +218,6 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchQuote();
   }
 
   @override
@@ -349,6 +371,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       isDarkMode = !isDarkMode;
     });
+    _savePrefs();
   }
 
   Widget _buildQuoteCard(Color accent) {
@@ -451,7 +474,7 @@ class _HomePageState extends State<HomePage> {
                   tooltip: isFavorited
                       ? "Remove from Favorites"
                       : "Add to Favorites",
-                  onPressed: () {
+                  onPressed: () async {
                     setState(() {
                       if (isFavorited) {
                         favoriteQuotes.removeWhere(
@@ -461,6 +484,7 @@ class _HomePageState extends State<HomePage> {
                             .add(QuoteModel(q: quote!.q, a: quote!.a));
                       }
                     });
+                    await _savePrefs();
                   },
                 ),
               ],
@@ -541,10 +565,11 @@ class _HomePageState extends State<HomePage> {
                           trailing: IconButton(
                             icon: Icon(Icons.delete, color: accent),
                             tooltip: "Remove from Favorites",
-                            onPressed: () {
+                            onPressed: () async {
                               setState(() {
                                 favoriteQuotes.removeAt(i);
                               });
+                              await _savePrefs();
                               if (favoriteQuotes.isEmpty)
                                 Navigator.of(context).pop();
                             },
