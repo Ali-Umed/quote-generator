@@ -25,86 +25,158 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:
+          isDarkMode ? const Color(0xFF181A20) : const Color(0xFFF6F8FB),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDarkMode
-                ? [Color(0xFF141E30), Color(0xFF243B55)]
-                : [Color(0xFFE0EAFC), Color(0xFFCFDEF3)],
+                ? [Color(0xFF232526), Color(0xFF414345), Color(0xFF141E30)]
+                : [Color(0xFFe0eafc), Color(0xFFcfdef3), Color(0xFFf8ffae)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "✨ Daily Inspiration",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      isDarkMode
-                          ? CupertinoIcons.sun_max_fill
-                          : CupertinoIcons.moon_fill,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                    onPressed: _toggleTheme,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  child: inProgress
-                      ? const Center(
-                          child: CupertinoActivityIndicator(
-                            radius: 15,
-                            color: Colors.white,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.format_quote_rounded,
+                          color: isDarkMode
+                              ? Colors.amberAccent
+                              : Colors.blueAccent,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Daily Inspiration",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                            letterSpacing: 1.2,
+                            shadows: isDarkMode
+                                ? [
+                                    Shadow(
+                                        color: Colors.black54,
+                                        blurRadius: 4,
+                                        offset: Offset(1, 2))
+                                  ]
+                                : [
+                                    Shadow(
+                                        color: Colors.white70,
+                                        blurRadius: 2,
+                                        offset: Offset(1, 1))
+                                  ],
                           ),
-                        )
-                      : errorMessage != null
-                          ? _buildErrorState()
-                          : _buildQuoteCard(),
-                ),
-              ),
-              CupertinoButton(
-                color: const Color.fromARGB(255, 47, 134, 148),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                onPressed: _fetchQuote,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(
-                      CupertinoIcons.refresh,
-                      size: 16,
-                      color: Colors.white,
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 6),
-                    Text(
-                      "New Quote",
-                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDarkMode ? Colors.white10 : Colors.black12,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDarkMode
+                                ? Colors.black26
+                                : Colors.grey.withOpacity(0.15),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          isDarkMode
+                              ? CupertinoIcons.sun_max_fill
+                              : CupertinoIcons.moon_fill,
+                          color: isDarkMode
+                              ? Colors.amberAccent
+                              : Colors.blueAccent,
+                        ),
+                        onPressed: _toggleTheme,
+                        tooltip: isDarkMode
+                            ? "Switch to Light Mode"
+                            : "Switch to Dark Mode",
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 24),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    child: inProgress
+                        ? Center(
+                            child: CupertinoActivityIndicator(
+                              radius: 18,
+                              color: isDarkMode
+                                  ? Colors.amberAccent
+                                  : Colors.blueAccent,
+                            ),
+                          )
+                        : errorMessage != null
+                            ? _buildErrorState()
+                            : _buildQuoteCard(),
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDarkMode
+                            ? Colors.amberAccent.withOpacity(0.18)
+                            : Colors.blueAccent.withOpacity(0.13),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: CupertinoButton(
+                    color: isDarkMode ? Colors.amberAccent : Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 22,
+                      vertical: 12,
+                    ),
+                    onPressed: _fetchQuote,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          CupertinoIcons.refresh,
+                          size: 18,
+                          color: isDarkMode ? Colors.black : Colors.white,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "New Quote",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: isDarkMode ? Colors.black : Colors.white,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+              ],
+            ),
           ),
         ),
       ),
@@ -133,44 +205,82 @@ class _HomePageState extends State<HomePage> {
 
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(16.0),
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+        padding: const EdgeInsets.all(22.0),
+        margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
         decoration: BoxDecoration(
-          color: isDarkMode
-              ? Colors.white.withOpacity(0.1)
-              : const Color.fromARGB(255, 190, 220, 232).withOpacity(0.9),
-          borderRadius: BorderRadius.circular(12.0),
+          gradient: isDarkMode
+              ? LinearGradient(
+                  colors: [Color(0xFF232526), Color(0xFF141E30)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : LinearGradient(
+                  colors: [Color(0xFFe0eafc), Color(0xFFcfdef3)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+          borderRadius: BorderRadius.circular(18.0),
           boxShadow: [
             BoxShadow(
               color: isDarkMode
-                  ? Colors.black.withOpacity(0.2)
-                  : Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              spreadRadius: 3,
+                  ? Colors.amberAccent.withOpacity(0.13)
+                  : Colors.blueAccent.withOpacity(0.10),
+              blurRadius: 18,
+              spreadRadius: 2,
+              offset: const Offset(0, 8),
             ),
           ],
+          border: Border.all(
+            color: isDarkMode
+                ? Colors.amberAccent.withOpacity(0.18)
+                : Colors.blueAccent.withOpacity(0.13),
+            width: 1.2,
+          ),
         ),
         child: Column(
           key: ValueKey(quote!.q),
           mainAxisSize: MainAxisSize.min,
           children: [
+            Icon(
+              Icons.format_quote_rounded,
+              color: isDarkMode ? Colors.amberAccent : Colors.blueAccent,
+              size: 32,
+            ),
+            const SizedBox(height: 10),
             Text(
               quote!.q as String,
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                height: 1.4,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                height: 1.5,
                 color: isDarkMode ? Colors.white : Colors.black87,
+                shadows: isDarkMode
+                    ? [
+                        Shadow(
+                            color: Colors.black54,
+                            blurRadius: 4,
+                            offset: Offset(1, 2))
+                      ]
+                    : [
+                        Shadow(
+                            color: Colors.white70,
+                            blurRadius: 2,
+                            offset: Offset(1, 1))
+                      ],
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(
               "- ${quote!.a}",
               style: TextStyle(
-                fontSize: 14,
-                color: isDarkMode ? Colors.white60 : Colors.black54,
+                fontSize: 15,
+                color: isDarkMode
+                    ? Colors.amberAccent.withOpacity(0.85)
+                    : Colors.blueAccent.withOpacity(0.85),
                 fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.2,
               ),
               textAlign: TextAlign.center,
             ),
