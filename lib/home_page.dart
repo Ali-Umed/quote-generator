@@ -41,7 +41,11 @@ class _HomePageState extends State<HomePage> {
           gradient: LinearGradient(
             colors: isDarkMode
                 ? [Color(0xFF232526), Color(0xFF414345), Color(0xFF141E30)]
-                : [Color(0xFFe0eafc), Color(0xFFcfdef3), Color(0xFFf8ffae)],
+                : [
+                    Color(0xFFe0eafc),
+                    Color.fromARGB(255, 167, 176, 188),
+                    Color.fromARGB(255, 197, 200, 156)
+                  ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -71,19 +75,6 @@ class _HomePageState extends State<HomePage> {
                             fontWeight: FontWeight.bold,
                             color: isDarkMode ? Colors.white : Colors.black87,
                             letterSpacing: 1.2,
-                            shadows: isDarkMode
-                                ? [
-                                    Shadow(
-                                        color: Colors.black54,
-                                        blurRadius: 4,
-                                        offset: Offset(1, 2))
-                                  ]
-                                : [
-                                    Shadow(
-                                        color: Colors.white70,
-                                        blurRadius: 2,
-                                        offset: Offset(1, 1))
-                                  ],
                           ),
                         ),
                       ],
@@ -92,15 +83,6 @@ class _HomePageState extends State<HomePage> {
                       decoration: BoxDecoration(
                         color: isDarkMode ? Colors.white10 : Colors.black12,
                         borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDarkMode
-                                ? Colors.black26
-                                : Colors.grey.withOpacity(0.15),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
                       ),
                       child: IconButton(
                         icon: Icon(
@@ -141,15 +123,6 @@ class _HomePageState extends State<HomePage> {
                                 : Colors.transparent,
                             width: 2.2,
                           ),
-                          boxShadow: selectedAccentIndex == i
-                              ? [
-                                  BoxShadow(
-                                    color: accentColors[i].withOpacity(0.4),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : [],
                         ),
                       ),
                     );
@@ -176,13 +149,6 @@ class _HomePageState extends State<HomePage> {
                   curve: Curves.easeInOut,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: accent.withOpacity(0.18),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
                   ),
                   child: CupertinoButton(
                     color: accent,
@@ -259,14 +225,6 @@ class _HomePageState extends State<HomePage> {
                   end: Alignment.bottomRight,
                 ),
           borderRadius: BorderRadius.circular(18.0),
-          boxShadow: [
-            BoxShadow(
-              color: accent.withOpacity(0.13),
-              blurRadius: 18,
-              spreadRadius: 2,
-              offset: const Offset(0, 8),
-            ),
-          ],
           border: Border.all(
             color: accent.withOpacity(0.18),
             width: 1.2,
@@ -289,19 +247,6 @@ class _HomePageState extends State<HomePage> {
                 fontWeight: FontWeight.w600,
                 height: 1.5,
                 color: isDarkMode ? Colors.white : Colors.black87,
-                shadows: isDarkMode
-                    ? [
-                        Shadow(
-                            color: Colors.black54,
-                            blurRadius: 4,
-                            offset: Offset(1, 2))
-                      ]
-                    : [
-                        Shadow(
-                            color: Colors.white70,
-                            blurRadius: 2,
-                            offset: Offset(1, 1))
-                      ],
               ),
               textAlign: TextAlign.center,
             ),
