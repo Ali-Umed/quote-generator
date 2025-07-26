@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quote_app/api.dart';
 import 'package:quote_app/quote_model.dart';
 
@@ -11,6 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<QuoteModel> favoriteQuotes = [];
   bool inProgress = false;
   QuoteModel? quote;
   String? errorMessage;
@@ -76,6 +78,19 @@ class _HomePageState extends State<HomePage> {
                             color: isDarkMode ? Colors.white : Colors.black87,
                             letterSpacing: 1.2,
                           ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: Icon(Icons.favorite,
+                              color: favoriteQuotes.isNotEmpty
+                                  ? accent
+                                  : (isDarkMode
+                                      ? Colors.white54
+                                      : Colors.black26)),
+                          tooltip: "View Favorites",
+                          onPressed: favoriteQuotes.isEmpty
+                              ? null
+                              : _showFavoritesModal,
                         ),
                       ],
                     ),
@@ -208,6 +223,9 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
+    final bool isFavorited =
+        favoriteQuotes.any((q) => q.q == quote!.q && q.a == quote!.a);
+
     return Center(
       child: Container(
         padding: const EdgeInsets.all(22.0),
@@ -262,9 +280,142 @@ class _HomePageState extends State<HomePage> {
               ),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.copy, color: accent),
+                  tooltip: "Copy Quote",
+                  onPressed: () async {
+                    final text = '"${quote!.q}" - ${quote!.a}';
+                    await Clipboard.setData(ClipboardData(text: text));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Quote copied to clipboard!"),
+                        backgroundColor: accent,
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    isFavorited ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorited
+                        ? accent
+                        : (isDarkMode ? Colors.white54 : Colors.black26),
+                  ),
+                  tooltip: isFavorited
+                      ? "Remove from Favorites"
+                      : "Add to Favorites",
+                  onPressed: () {
+                    setState(() {
+                      if (isFavorited) {
+                        favoriteQuotes.removeWhere(
+                            (q) => q.q == quote!.q && q.a == quote!.a);
+                      } else {
+                        favoriteQuotes
+                            .add(QuoteModel(q: quote!.q, a: quote!.a));
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showFavoritesModal() {
+    final Color accent = accentColors[selectedAccentIndex];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDarkMode ? const Color(0xFF232526) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Favorite Quotes",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: accent,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: accent),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                if (favoriteQuotes.isEmpty)
+                  Center(
+                    child: Text(
+                      "No favorites yet.",
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 300,
+                    child: ListView.separated(
+                      itemCount: favoriteQuotes.length,
+                      separatorBuilder: (_, __) => Divider(),
+                      itemBuilder: (context, i) {
+                        final fav = favoriteQuotes[i];
+                        return ListTile(
+                          title: Text(
+                            fav.q ?? '',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black87,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "- ${fav.a ?? ''}",
+                            style: TextStyle(
+                              color: accent,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete, color: accent),
+                            tooltip: "Remove from Favorites",
+                            onPressed: () {
+                              setState(() {
+                                favoriteQuotes.removeAt(i);
+                              });
+                              if (favoriteQuotes.isEmpty)
+                                Navigator.of(context).pop();
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
